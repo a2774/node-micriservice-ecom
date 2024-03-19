@@ -1,0 +1,59 @@
+const User = require("./user.model");
+const bcrypt = require("bcrypt");
+
+const saltRounds = 10;
+
+module.exports.addUser = async (req, res) => {
+  const { name, lastname, email, password } = req.body;
+
+  try {
+    const emailValid = await User.findOne({ email });
+
+    if (emailValid) {
+      return res.status(400).json({ message: "Email already in use" });
+    }
+
+    // Hash the password using bcrypt
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const newUser = new User({ name, lastname, email, password: hashedPassword }); 
+
+    const savedUser = await newUser.save();
+
+    res.json({ message: "User added successfully", user: savedUser });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports.login = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Find user by email
+    const user = await User.findOne({ email });
+
+    // Check if user exists
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Compare passwords
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Incorrect password" });
+    }
+
+    // Login successful
+    res.json({ message: "Login successful" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+module.exports.resetpassword = async(req, res)=>{
+    
+}
