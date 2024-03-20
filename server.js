@@ -1,7 +1,7 @@
 const express = require('express');
 require('dotenv').config();
 
-const port = 8000;
+const port = process.env.PORT;
 const app = express();
 
 const Productrouter = require('./src/features/product/product.router');
@@ -12,7 +12,7 @@ const db = require('./src/middileware/db.connection');
 app.use(express.json());
 app.use('/api/product',Productrouter);
 app.use('/api/user', Userrouter);
-app.use('/api/cart', Cartrouter);
+app.use('/api/cart', Cartrouter); 
 app.use('/api/order', Orderrouter);
  
 
