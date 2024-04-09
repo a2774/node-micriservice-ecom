@@ -60,35 +60,31 @@ module.exports.update = async (req, res) => {
   }
 };
 module.exports.filter = async (req, res) => {
-    try {
-        let query = {};
+  try {
+    let query = {};
+
+    if (req.query.productName) {
+      query.productName = { $regex: new RegExp(req.query.productName, "i") };
+    }
+
+    if (req.query.category) {
+      query.category = req.query.category;
+    }
+
+    if (req.query.minPrice) {
+      query.price = { $gte: req.query.minPrice };
+    }
+
     
-        // Check if productName parameter is provided
-        if (req.query.productName) {
-          query.productName = { $regex: new RegExp(req.query.productName, 'i') };
-        }
-    
-        // Check if category parameter is provided
-        if (req.query.category) {
-          query.category = req.query.category;
-        }
-    
-        // Check if minPrice parameter is provided
-        if (req.query.minPrice) {
-          query.price = { $gte: req.query.minPrice };
-        }
-    
-        // Check if maxPrice parameter is provided
-        if (req.query.maxPrice) {
-          query.price = { ...query.price, $lte: req.query.maxPrice };
-        }
-    
-        const products = await Product.find(query);
-    
-        res.json(products);
-      } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Server error' });
-      }
-  };
-  
+    if (req.query.maxPrice) {
+      query.price = { ...query.price, $lte: req.query.maxPrice };
+    }
+
+    const products = await Product.find(query);
+
+    res.json(products);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
